@@ -16,10 +16,10 @@
         <nav>
             <ul class="nav-links">
                 <li><a href="{% url 'index' %}">Главная</a></li>
-                <li><a href="">Созданные заявки</a></li>
-                <li><a href="">Подать заявку</a></li>
-                <li><a href="">Вход</a></li>
-                <li><a href="">Регистрация</a></li>
+                <li><a href="{% url 'reports' %}">Созданные заявки</a></li>
+                <li><a href="{% url 'report' %}">Подать заявку</a></li>
+                <li><a href="{% url 'login' %}">Вход</a></li>
+                <li><a href="{% url 'register' %}">Регистрация</a></li>
             </ul>
         </nav>
         <div class="burger-menu">
