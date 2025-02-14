@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Регистрация - Better Together</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        main {
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }       
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <img src="logo.png" alt="Logo">
+            <span>Better together</span>
+        </div>
+        <nav>
+            <ul class="nav-links">
+                <li><a href="index.html">Главная</a></li>
+                <li><a href="reports.html">Созданные заявки</a></li>
+                <li><a href="report.html">Подать заявку</a></li>
+                <li><a href="vhod.html">Вход</a></li>
+                <li><a href="register.html">Регистрация</a></li>
+            </ul>
+        </nav>
+        <div class="burger-menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </header>
+    
+    <main>
+        <section class="registration-container">
+            <h2>Регистрация</h2>
+            <form class="registration-form">
+                <label for="full-name">ФИО</label>
+                <input type="text" id="full-name" name="full-name" required>
+                
+                <label for="username">Логин</label>
+                <input type="text" id="username" name="username" required>
+                
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required>
+                
+                <label for="password">Пароль</label>
+                <input type="password" id="password" name="password" required>
+                
+                <label for="confirm-password">Повтор пароля</label>
+                <input type="password" id="confirm-password" name="confirm-password" required>
+                
+                <div class="checkbox-container">
+                    <input type="checkbox" id="agreement" name="agreement" required>
+                    <label for="agreement">Согласие на обработку персональных данных</label>
+                </div>
+                
+                <button type="submit" class="register-button">Зарегистрироваться</button>
+            </form>
+        </section>
+    </main>
+    
+    <footer>
+        <p>Политика конфиденциальности</p>
+    </footer>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+        const burger = document.querySelector(".burger-menu");
+        const nav = document.querySelector(".nav-links");
+
+        burger.addEventListener("click", () => {
+            nav.classList.toggle("active");
+            burger.classList.toggle("active");
+        });
+    });
+    </script>
+</body>
+</html>

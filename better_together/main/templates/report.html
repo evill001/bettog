@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Подать заявку - Better Together</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        main {
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }       
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <img src="logo.png" alt="Logo">
+            <span>Better together</span>
+        </div>
+        <nav>
+            <ul class="nav-links">
+                <li><a href="index.html">Главная</a></li>
+                <li><a href="reports.html">Созданные заявки</a></li>
+                <li><a href="report.html">Подать заявку</a></li>
+                <li><a href="vhod.html">Вход</a></li>
+                <li><a href="register.html">Регистрация</a></li>
+            </ul>
+        </nav>
+        <div class="burger-menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </header>
+    
+    <main>
+        <section class="submit-request">
+            <h2>Подать заявку</h2>
+            <form action="#" method="post" enctype="multipart/form-data">
+                <label for="title">Название</label>
+                <input type="text" id="title" name="title" required>
+                
+                <label for="description">Описание</label>
+                <textarea id="description" name="description" required></textarea>
+                
+                <label for="category">Категория</label>
+                <select id="category" name="category">
+                    <option value="1">Категория 1</option>
+                    <option value="2">Категория 2</option>
+                </select>
+                
+                <label for="photo">Фотография</label>
+                <input type="file" id="photo" name="photo" accept="image/*">
+                <p>Примечание: фотография не должна превышать размер в 10МБ</p>
+                
+                <button type="submit">Отправить</button>
+            </form>
+        </section>
+    </main>
+    
+    <footer>
+        <p>Политика конфиденциальности</p>
+    </footer>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+        const burger = document.querySelector(".burger-menu");
+        const nav = document.querySelector(".nav-links");
+
+        burger.addEventListener("click", () => {
+            nav.classList.toggle("active");
+            burger.classList.toggle("active");
+        });
+    });
+    </script>
+</body>
+</html>
