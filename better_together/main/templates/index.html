@@ -1,24 +1,25 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Better Together</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
 </head>
 <body>
     <header>
         <div class="logo">
-            <img src="logo.png" alt="Logo">
+            <img src="{% static 'logo.png' %}" alt="Logo">
             <span>Better together</span>
         </div>
         <nav>
             <ul class="nav-links">
-                <li><a href="index.html">Главная</a></li>
-                <li><a href="reports.html">Созданные заявки</a></li>
-                <li><a href="report.html">Подать заявку</a></li>
-                <li><a href="vhod.html">Вход</a></li>
-                <li><a href="register.html">Регистрация</a></li>
+                <li><a href="{% url 'index' %}">Главная</a></li>
+                <li><a href="">Созданные заявки</a></li>
+                <li><a href="">Подать заявку</a></li>
+                <li><a href="">Вход</a></li>
+                <li><a href="">Регистрация</a></li>
             </ul>
         </nav>
         <div class="burger-menu">
@@ -45,7 +46,7 @@
                         <td>123</td>
                         <td>123</td>
                         <td>123</td>
-                        <td>123</td>
+                        <td><img src="{% static 'example.jpg' %}" alt="Фото заявки"></td>
                     </tr>
                 </tbody>
             </table>
@@ -56,17 +57,6 @@
     <footer>
         <p>Политика конфиденциальности</p>
     </footer>
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-        const burger = document.querySelector(".burger-menu");
-        const nav = document.querySelector(".nav-links");
-
-        burger.addEventListener("click", () => {
-            nav.classList.toggle("active");
-            burger.classList.toggle("active");
-        });
-    });
-    </script>
+    <script src="{% static 'script.js' %}"></script>
 </body>
 </html>
-
