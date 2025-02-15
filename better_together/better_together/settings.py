@@ -10,6 +10,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+LOGIN_URL = "/login/"
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -92,6 +93,9 @@ USE_I18N = True
 
 USE_TZ = True
 
+LOGIN_REDIRECT_URL = "/profile/"
+
+LOGOUT_REDIRECT_URL = "/"
 
 STATIC_URL = 'static/'
 

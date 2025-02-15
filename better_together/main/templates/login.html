@@ -50,9 +50,17 @@
             <ul class="nav-links">
                 <li><a href="{% url 'index' %}">Главная</a></li>
                 <li><a href="{% url 'reports' %}">Созданные заявки</a></li>
-                <li><a href="{% url 'report' %}">Подать заявку</a></li>
-                <li><a href="{% url 'login' %}">Вход</a></li>
-                <li><a href="{% url 'register' %}">Регистрация</a></li>
+                <li><a href="{% url 'submit_request' %}">Подать заявку</a></li>
+                {% if user.is_authenticated %}
+                    <form action="{% url 'logout' %}" method="post" style="display: inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">Выйти</button>
+                    </form>
+                    <a href="#">Личный кабинет</a>
+                {% else %}
+                    <a href="{% url 'login' %}">Вход</a>
+                    <a href="{% url 'register' %}">Регистрация</a>
+                {% endif %}
             </ul>
         </nav>
         <div class="burger-menu">
@@ -61,21 +69,22 @@
             <span></span>
         </div>
     </header>
-    
-    <main>
-        <section class="login-container">
-            <h2>Вход</h2>
-            <form class="login-form">
-                <label for="username">Логин</label>
-                <input type="text" id="username" name="username" required>
-                
-                <label for="password">Пароль</label>
-                <input type="password" id="password" name="password" required>
-                
-                <button type="submit" class="login-button">Вход</button>
-            </form>
-        </section>
-    </main>
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-warning">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    {% block content %}
+        <h2>Вход</h2>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Войти</button>
+        </form>
+    {% endblock %}
     
     <footer>
         <p>Политика конфиденциальности</p>

@@ -1,13 +1,16 @@
-from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.db import models
 from django.conf import settings
+
+class CustomUser(AbstractUser):
+    full_name = models.CharField(max_length=255, verbose_name="ФИО")
+    email = models.EmailField(unique=True, verbose_name="Email")
+
+    def __str__(self):
+        return self.username
 
 class Profile(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-
-    def __str__(self):
-        return self.user.username
-
 
 class Request(models.Model):
     CATEGORY_CHOICES = [
@@ -18,7 +21,7 @@ class Request(models.Model):
 
     title = models.CharField(max_length=200, verbose_name="Название")
     description = models.TextField(verbose_name="Описание")
-    ategory = models.CharField(
+    category = models.CharField(  # Исправил опечатку "ategory" -> "category"
         max_length=50,
         choices=CATEGORY_CHOICES,
         verbose_name="Категория",
@@ -31,9 +34,12 @@ class Request(models.Model):
     def __str__(self):
         return self.title
 
-class CustomUser(AbstractUser):
-    full_name = models.CharField(max_length=255, verbose_name="ФИО")
-    email = models.EmailField(unique=True, verbose_name="Email")
-    
+class Report(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)  # Заменил `User` на `settings.AUTH_USER_MODEL`
+    title = models.CharField(max_length=255)
+    description = models.TextField()
+    file = models.FileField(upload_to="reports/", blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
     def __str__(self):
-        return self.username
+        return self.title

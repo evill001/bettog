@@ -24,9 +24,17 @@
             <ul class="nav-links">
                 <li><a href="{% url 'index' %}">Главная</a></li>
                 <li><a href="{% url 'reports' %}">Созданные заявки</a></li>
-                <li><a href="{% url 'report' %}">Подать заявку</a></li>
-                <li><a href="{% url 'login' %}">Вход</a></li>
-                <li><a href="{% url 'register' %}">Регистрация</a></li>
+                <li><a href="{% url 'submit_request' %}">Подать заявку</a></li>
+                {% if user.is_authenticated %}
+                    <form action="{% url 'logout' %}" method="post" style="display: inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">Выйти</button>
+                    </form>
+                    <a href="#">Личный кабинет</a>
+                {% else %}
+                    <a href="{% url 'login' %}">Вход</a>
+                    <a href="{% url 'register' %}">Регистрация</a>
+                {% endif %}
             </ul>
         </nav>
         <div class="burger-menu">
@@ -36,34 +44,14 @@
         </div>
     </header>
     
-    <main>
-        <section class="registration-container">
-            <h2>Регистрация</h2>
-            <form class="registration-form">
-                <label for="full-name">ФИО</label>
-                <input type="text" id="full-name" name="full-name" required>
-                
-                <label for="username">Логин</label>
-                <input type="text" id="username" name="username" required>
-                
-                <label for="email">Email</label>
-                <input type="email" id="email" name="email" required>
-                
-                <label for="password">Пароль</label>
-                <input type="password" id="password" name="password" required>
-                
-                <label for="confirm-password">Повтор пароля</label>
-                <input type="password" id="confirm-password" name="confirm-password" required>
-                
-                <div class="checkbox-container">
-                    <input type="checkbox" id="agreement" name="agreement" required>
-                    <label for="agreement">Согласие на обработку персональных данных</label>
-                </div>
-                
-                <button type="submit" class="register-button">Зарегистрироваться</button>
-            </form>
-        </section>
-    </main>
+    {% block content %}
+        <h2>Регистрация</h2>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Зарегистрироваться</button>
+        </form>
+    {% endblock %}
     
     <footer>
         <p>Политика конфиденциальности</p>
