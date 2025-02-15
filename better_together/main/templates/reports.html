@@ -39,33 +39,50 @@
     
     <main class="container">
         <section class="filters">
-            <h2>Доступная фильтрация созданных вами заявок:</h2>
-            <label><input type="checkbox"> Только со статусом “Новая”</label>
-            <label><input type="checkbox"> Только со статусом “Решенная”</label>
-            <label><input type="checkbox"> Временная метка</label>
+            <h2>Фильтрация заявок:</h2>
+            <label><input type="checkbox" id="filter-new"> Только "Ожидание"</label>
+            <label><input type="checkbox" id="filter-solved"> Только "Решено"</label>
+            <select id="filter-category">
+                <option value="">Все категории</option>
+                <option value="Техническая">Техническая</option>
+                <option value="Финансовая">Финансовая</option>
+                <option value="Общая">Общая</option>
+            </select>
         </section>
         
         <section class="created-requests">
-            <h2>Созданные заявки</h2>
+            <h2>Ваши заявки</h2>
             <table>
                 <thead>
                     <tr>
-                        <th>Временная метка</th>
+                        <th>Дата</th>
                         <th>Название</th>
-                        <th>Категория заявки</th>
-                        <th>Фотография</th>
+                        <th>Категория</th>
+                        <th>Фото</th>
                         <th>Статус</th>
                     </tr>
                 </thead>
-                <tbody>
-                    <tr>
-                        <td>123</td>
-                        <td>123</td>
-                        <td>123</td>
-                        <td>123</td>
-                        <td>123</td>
+                <tbody id="requests-table">
+                    {% for request in requests %}
+                    <tr class="request-row" data-status="{{ request.status }}" data-category="{{ request.category }}">
+                        <td>{{ request.created_at|date:"d.m.Y H:i" }}</td>
+                        <td>{{ request.title }}</td>
+                        <td>{{ request.category }}</td>
+                        <td>
+                            {% if request.image %}
+                                <img src="{{ request.image.url }}" alt="Фото" width="100">
+                            {% else %}
+                                Нет фото
+                            {% endif %}
+                        </td>
+                        <td>{{ request.status }}</td>
                     </tr>
-                </tbody>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5">У вас пока нет заявок.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>                
             </table>
         </section>
     </main>
@@ -73,16 +90,32 @@
     <footer>
         <p>Политика конфиденциальности</p>
     </footer>
+    
     <script>
         document.addEventListener("DOMContentLoaded", () => {
-        const burger = document.querySelector(".burger-menu");
-        const nav = document.querySelector(".nav-links");
+            const filterNew = document.getElementById("filter-new");
+            const filterSolved = document.getElementById("filter-solved");
+            const filterCategory = document.getElementById("filter-category");
+            const rows = document.querySelectorAll(".request-row");
 
-        burger.addEventListener("click", () => {
-            nav.classList.toggle("active");
-            burger.classList.toggle("active");
+            function applyFilters() {
+                rows.forEach(row => {
+                    const status = row.dataset.status;
+                    const category = row.dataset.category;
+                    let show = true;
+
+                    if (filterNew.checked && status !== "Ожидание") show = false;
+                    if (filterSolved.checked && status !== "Решено") show = false;
+                    if (filterCategory.value && category !== filterCategory.value) show = false;
+
+                    row.style.display = show ? "" : "none";
+                });
+            }
+
+            filterNew.addEventListener("change", applyFilters);
+            filterSolved.addEventListener("change", applyFilters);
+            filterCategory.addEventListener("change", applyFilters);
         });
-    });
     </script>
 </body>
 </html>

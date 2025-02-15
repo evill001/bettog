@@ -62,17 +62,33 @@
                     <tbody>
                         {% for request in user_requests %}
                         <tr>
-                            <td>{{ request.timestamp }}</td>
+                            <td>{{ request.created_at|date:"d.m.Y H:i" }}</td>
                             <td>{{ request.title }}</td>
                             <td>{{ request.category }}</td>
+                            <td>{{ request.status }}</td>
                             <td>
                                 {% if request.image %}
-                                    <img src="{{ request.image.url }}" alt="Фото заявки" width="50">
+                                    <img src="{{ request.image.url }}" alt="Фото" width="100">
                                 {% else %}
                                     Нет фото
                                 {% endif %}
                             </td>
-                            <td>{{ request.status }}</td>
+                            {% if user.is_staff %}  <!-- Админ видит кнопки управления -->
+                            <td>
+                                <form action="{% url 'update_request_status' request.id %}" method="post">
+                                    {% csrf_token %}
+                                    <button type="submit">Изменить статус</button>
+                                </form>
+                                <form action="{% url 'delete_request' request.id %}" method="post" onsubmit="return confirm('Вы уверены?');">
+                                    {% csrf_token %}
+                                    <button type="submit" class="delete-btn">Удалить</button>
+                                </form>
+                            </td>
+                            {% endif %}
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6">Заявок пока нет.</td>
                         </tr>
                         {% endfor %}
                     </tbody>

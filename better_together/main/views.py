@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login
@@ -60,8 +60,6 @@ def submit_request(request):
     return render(request, "submit_request.html", {"form": form})
 
 
-
-
 @login_required
 def create_request(request):
     if not request.user.is_authenticated:
@@ -81,11 +79,15 @@ def create_request(request):
     return render(request, "create_request.html", {"form": form})
 
 
-
 @login_required
 def profile(request):
     user = CustomUser.objects.get(id=request.user.id)  # Получаем текущего пользователя
-    user_requests = Request.objects.filter(user=user).order_by('-created_at')[:4]  # Ограничиваем 4 последними
+
+    if request.user.is_staff:  
+        user_requests = Request.objects.all().order_by('-created_at')  # Админ видит ВСЕ заявки
+    else:
+        user_requests = Request.objects.filter(user=user).order_by('-created_at')  # Обычный юзер – только свои
+
     return render(request, "profile.html", {"user": user, "user_requests": user_requests})
 
 
@@ -99,3 +101,35 @@ def index(request):
     }
 
     return render(request, 'index.html', context)
+
+
+@login_required
+def reports(request):
+    user_requests = Request.objects.filter(user=request.user)  # Все заявки пользователя
+    return render(request, "reports.html", {"requests": user_requests})
+
+
+@login_required
+def delete_request(request, request_id):
+    request_obj = get_object_or_404(Request, id=request_id)
+
+    if request.user.is_staff:  # Только админ может удалять заявки
+        request_obj.delete()
+        messages.success(request, "Заявка успешно удалена!")
+    else:
+        messages.error(request, "У вас нет прав на удаление этой заявки.")
+
+    return redirect("profile")  # Перенаправляем обратно в личный кабинет
+
+@login_required
+def update_request_status(request, request_id):
+    request_obj = get_object_or_404(Request, id=request_id)
+
+    if request.user.is_staff:  # Только админ может менять статус
+        request_obj.status = "Решено" if request_obj.status == "Ожидание" else "Ожидание"
+        request_obj.save()
+        messages.success(request, "Статус заявки обновлён!")
+    else:
+        messages.error(request, "У вас нет прав на изменение статуса.")
+
+    return redirect("profile")
