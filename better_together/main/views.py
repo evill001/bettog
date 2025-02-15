@@ -3,9 +3,8 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login
 from .forms import RegistrationForm, ReportForm
-from .models import Report
+from .models import Report, Request, CustomUser
 from .forms import RequestForm  # Добавляем форму заявок
-from .models import Request
 
 
 def index(request):
@@ -41,33 +40,62 @@ def register(request):
     return render(request, "register.html", {"form": form})
 
 
+@login_required
 def submit_request(request):
     if request.method == "POST":
-        form = ReportForm(request.POST, request.FILES)
-        if form.is_valid():
-            report = form.save(commit=False)
-            report.user = request.user  # Если заявки привязаны к пользователю
-            report.save()
-            return redirect("reports")  # Перенаправляем на страницу с заявками
-    else:
-        form = ReportForm()
+        print(f"request.user: {request.user}")  
+        print(f"request.user.is_authenticated: {request.user.is_authenticated}")  
+        print(f"request.user.id: {request.user.id}")  
 
-    return render(request, "submit_request.html", {"form": form})  # <--- Тут форма передаётся!
+        form = RequestForm(request.POST, request.FILES)
+        if form.is_valid():
+            new_request = form.save(commit=False)
+            new_request.user = request.user  
+            print(f"new_request.user перед сохранением: {new_request.user}")  
+            new_request.save()
+            return redirect("reports")
+    else:
+        form = RequestForm()
+    
+    return render(request, "submit_request.html", {"form": form})
+
+
 
 
 @login_required
 def create_request(request):
     if not request.user.is_authenticated:
-            messages.warning(request, "Чтобы подать заявку, вам нужно войти в аккаунт.")
-            return redirect("login")  # Перенаправляем на страницу входа
+        messages.warning(request, "Чтобы подать заявку, вам нужно войти в аккаунт.")
+        return redirect("login")  # Перенаправляем на страницу входа
 
     if request.method == "POST":
         form = RequestForm(request.POST, request.FILES)
         if form.is_valid():
             request_obj = form.save(commit=False)
+            request_obj.user = request.user  # Устанавливаем пользователя перед сохранением
             request_obj.save()
             return redirect("index")  # Перенаправляем после отправки
     else:
         form = RequestForm()
 
     return render(request, "create_request.html", {"form": form})
+
+
+
+@login_required
+def profile(request):
+    user = CustomUser.objects.get(id=request.user.id)  # Получаем текущего пользователя
+    user_requests = Request.objects.filter(user=user).order_by('-created_at')[:4]  # Ограничиваем 4 последними
+    return render(request, "profile.html", {"user": user, "user_requests": user_requests})
+
+
+def index(request):
+    latest_requests = Request.objects.order_by('-created_at')[:4]  # Последние 4 заявки
+    solved_requests_count = Request.objects.filter(status='Решено').count()  # Количество решённых
+
+    context = {
+        'latest_requests': latest_requests,
+        'solved_requests_count': solved_requests_count,
+    }
+
+    return render(request, 'index.html', context)

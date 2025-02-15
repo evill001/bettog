@@ -13,6 +13,7 @@ class Profile(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
 class Request(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     CATEGORY_CHOICES = [
         ('Техническая', 'Техническая'),
         ('Финансовая', 'Финансовая'),

@@ -40,25 +40,39 @@
     <main>
         <section class="resolved-requests">
             <h2>Решенные заявки</h2>
+            <p>Количество всего решенных заявок: {{ solved_requests_count }}</p>
+            
+            <h3>Последние заявки:</h3>
             <table>
                 <thead>
                     <tr>
                         <th>Временная метка</th>
                         <th>Название</th>
-                        <th>Категория заявки</th>
+                        <th>Категория</th>
                         <th>Фотография</th>
                     </tr>
                 </thead>
                 <tbody>
+                    {% for request in latest_requests %}
                     <tr>
-                        <td>123</td>
-                        <td>123</td>
-                        <td>123</td>
-                        <td><img src="{% static 'example.jpg' %}" alt="Фото заявки"></td>
+                        <td>{{ request.created_at|date:"d.m.Y H:i" }}</td>
+                        <td>{{ request.title }}</td>
+                        <td>{{ request.category }}</td>
+                        <td>
+                            {% if request.image %}
+                                <img src="{{ request.image.url }}" alt="Фото заявки" width="100">
+                            {% else %}
+                                Нет фото
+                            {% endif %}
+                        </td>
                     </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4">Заявок пока нет.</td>
+                    </tr>
+                    {% endfor %}
                 </tbody>
             </table>
-            <p>Количество всего решенных заявок: ∞</p>
         </section>
     </main>
     

@@ -47,21 +47,23 @@
             <span>Better together</span>
         </div>
         <nav>
-            <ul class="nav-links">
-                <li><a href="{% url 'index' %}">Главная</a></li>
-                <li><a href="{% url 'reports' %}">Созданные заявки</a></li>
-                <li><a href="{% url 'submit_request' %}">Подать заявку</a></li>
-                {% if user.is_authenticated %}
-                    <form action="{% url 'logout' %}" method="post" style="display: inline;">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-danger">Выйти</button>
-                    </form>
-                    <a href="#">Личный кабинет</a>
-                {% else %}
-                    <a href="{% url 'login' %}">Вход</a>
-                    <a href="{% url 'register' %}">Регистрация</a>
-                {% endif %}
-            </ul>
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="{% url 'index' %}">Главная</a></li>
+                    <li><a href="{% url 'reports' %}">Созданные заявки</a></li>
+                    <li><a href="{% url 'submit_request' %}">Подать заявку</a></li>
+                    {% if user.is_authenticated %}
+                        <form action="{% url 'logout' %}" method="post" style="display: inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger">Выйти</button>
+                        </form>
+                        <a href="{% url 'profile' %}">Личный кабинет</a>
+                    {% else %}
+                        <a href="{% url 'login' %}">Вход</a>
+                        <a href="{% url 'register' %}">Регистрация</a>
+                    {% endif %}
+                </ul>
+            </nav>
         </nav>
         <div class="burger-menu">
             <span></span>

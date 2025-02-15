@@ -6,57 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Личный кабинет - Better Together</title>
     <link rel="stylesheet" href="{% static 'styles.css' %}">
-    <style>
-        main {
-            padding: 20px;
-            max-width: 900px;
-            margin: auto;
-        }
-
-        .profile-container {
-            background: #dbe4ff;
-            padding: 20px;
-            border-radius: 15px;
-            max-width: 500px;
-            margin-bottom: 20px;
-        }
-
-        .profile-container p {
-            margin: 10px 0;
-        }
-
-        .logout-button {
-            display: block;
-            background: white;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-
-        .requests-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-
-        .requests-table th, .requests-table td {
-            border: 1px solid black;
-            padding: 8px;
-            text-align: center;
-        }
-
-        .requests-table th {
-            background: #ddd;
-        }
-    </style>
 </head>
 <body>
     <header>
         <div class="logo">
             <img src="{% static 'logo.png' %}" alt="Logo">
-            <span>Better together</span>
+            <span>Better Together</span>
         </div>
         <nav>
             <ul class="nav-links">
@@ -75,63 +30,61 @@
                 {% endif %}
             </ul>
         </nav>
-        <div class="burger-menu">
-            <span></span>
-            <span></span>
-            <span></span>
-        </div>
     </header>
     
     <main>
         <section class="profile-container">
             <h2>Личный кабинет</h2>
             <div class="profile-info">
-                <p><strong>Логин:</strong> login</p>
-                <p><strong>ФИО:</strong> Иванов Иван Иванович</p>
-                <p><strong>Email:</strong> email@mail.com</p>
-                <button class="logout-button">Выход</button>
+                <p><strong>Логин:</strong> {{ user.username }}</p>
+                <p><strong>ФИО:</strong> {{ user.get_full_name }}</p>
+                <p><strong>Email:</strong> {{ user.email }}</p>
+                <form action="{% url 'logout' %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="logout-button">Выход</button>
+                </form>
             </div>
         </section>
         
         <section class="requests-container">
             <h3>Созданные заявки</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Временная метка</th>
-                        <th>Название</th>
-                        <th>Категория заявки</th>
-                        <th>Фотография</th>
-                        <th>Статус</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>123</td>
-                        <td>123</td>
-                        <td>123</td>
-                        <td>123</td>
-                        <td>123</td>
-                    </tr>
-                </tbody>
-            </table>
-            <p class="more-requests"><a href="reports.html">Остальные заявки</a></p>
+            {% if user_requests %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Временная метка</th>
+                            <th>Название</th>
+                            <th>Категория заявки</th>
+                            <th>Фотография</th>
+                            <th>Статус</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for request in user_requests %}
+                        <tr>
+                            <td>{{ request.timestamp }}</td>
+                            <td>{{ request.title }}</td>
+                            <td>{{ request.category }}</td>
+                            <td>
+                                {% if request.image %}
+                                    <img src="{{ request.image.url }}" alt="Фото заявки" width="50">
+                                {% else %}
+                                    Нет фото
+                                {% endif %}
+                            </td>
+                            <td>{{ request.status }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p>У вас пока нет заявок.</p>
+            {% endif %}
         </section>
     </main>
     
     <footer>
         <p>Политика конфиденциальности</p>
     </footer>
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-        const burger = document.querySelector(".burger-menu");
-        const nav = document.querySelector(".nav-links");
-
-        burger.addEventListener("click", () => {
-            nav.classList.toggle("active");
-            burger.classList.toggle("active");
-        });
-    });
-    </script>
 </body>
 </html>

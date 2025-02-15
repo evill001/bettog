@@ -30,7 +30,7 @@
                         {% csrf_token %}
                         <button type="submit" class="btn btn-danger">Выйти</button>
                     </form>
-                    <a href="#">Личный кабинет</a>
+                    <a href="{% url 'profile' %}">Личный кабинет</a>
                 {% else %}
                     <a href="{% url 'login' %}">Вход</a>
                     <a href="{% url 'register' %}">Регистрация</a>
