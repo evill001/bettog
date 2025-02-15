@@ -31,12 +31,33 @@ nav ul {
     list-style: none;
     display: flex;
     gap: 15px;
+    padding: 0;
 }
+
+nav ul li {
+    display: flex;
+    align-items: center;
+}
+
 nav ul li a {
     text-decoration: none;
     color: black;
     font-weight: bold;
 }
+
+.logout-btn {
+    background: none;
+    border: none;
+    color: black;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.logout-btn:hover {
+    color: red;
+}
+
 main {
     padding: 20px;
 }

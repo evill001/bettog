@@ -7,100 +7,110 @@
     <title>Вход - Better Together</title>
     <link rel="stylesheet" href="{% static 'styles.css' %}">
     <style>
-        main {
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-        } 
-        .login-container {
-            background-color: #e9f0ff;
-            padding: 40px;
-            border-radius: 20px;
-            text-align: center;
-            margin-top: 50px;
-            width: 400px;
-        }
-        .login-form {
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            align-items: center;
+            height: 100vh;
         }
-        .login-form input {
-            padding: 10px;
-            border: none;
+
+        .login-container {
+            background: white;
+            padding: 40px;
             border-radius: 10px;
-            background-color: #c8d9ff;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            margin-top: 50px;
         }
-        .login-button {
+
+        h2 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            text-align: left;
+        }
+
+        label {
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        input, button {
             padding: 10px;
+            margin-top: 5px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            width: 100%;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            font-size: 16px;
             border: none;
-            border-radius: 10px;
-            background-color: white;
             cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .errorlist {
+            color: red;
+            font-size: 14px;
+            text-align: left;
+            margin: 5px 0;
+            padding-left: 10px;
+        }
+
+        .register-link {
+            display: block;
+            margin-top: 10px;
+            font-size: 14px;
+            color: #007bff;
+            text-decoration: none;
+            text-align: center;
+        }
+
+        .register-link:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
 <body>
-    <header>
-        <div class="logo">
-            <img src="{% static 'logo.png' %}" alt="Logo">
-            <span>Better together</span>
-        </div>
-        <nav>
-            <nav>
-                <ul class="nav-links">
-                    <li><a href="{% url 'index' %}">Главная</a></li>
-                    <li><a href="{% url 'reports' %}">Созданные заявки</a></li>
-                    <li><a href="{% url 'submit_request' %}">Подать заявку</a></li>
-                    {% if user.is_authenticated %}
-                        <form action="{% url 'logout' %}" method="post" style="display: inline;">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-danger">Выйти</button>
-                        </form>
-                        <a href="{% url 'profile' %}">Личный кабинет</a>
-                    {% else %}
-                        <a href="{% url 'login' %}">Вход</a>
-                        <a href="{% url 'register' %}">Регистрация</a>
-                    {% endif %}
-                </ul>
-            </nav>
-        </nav>
-        <div class="burger-menu">
-            <span></span>
-            <span></span>
-            <span></span>
-        </div>
-    </header>
-    {% if messages %}
-        {% for message in messages %}
-            <div class="alert alert-warning">
-                {{ message }}
-            </div>
-        {% endfor %}
-    {% endif %}
-
-    {% block content %}
+    <div class="login-container">
         <h2>Вход</h2>
         <form method="post">
             {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit">Войти</button>
-        </form>
-    {% endblock %}
-    
-    <footer>
-        <p>Политика конфиденциальности</p>
-    </footer>
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-        const burger = document.querySelector(".burger-menu");
-        const nav = document.querySelector(".nav-links");
 
-        burger.addEventListener("click", () => {
-            nav.classList.toggle("active");
-            burger.classList.toggle("active");
-        });
-    });
-    </script>
+            <!-- Поле логина -->
+            <label for="{{ form.username.id_for_label }}">Имя пользователя:</label>
+            {{ form.username }}
+            {{ form.username.errors }}
+
+            <!-- Поле пароля -->
+            <label for="{{ form.password.id_for_label }}">Пароль:</label>
+            {{ form.password }}
+            {{ form.password.errors }}
+
+            <!-- Кнопка входа -->
+            <button type="submit">Войти</button>
+
+            <!-- Ссылка на регистрацию -->
+            <a href="{% url 'register' %}" class="register-link">Нет аккаунта? Зарегистрироваться</a>
+        </form>
+    </div>
+    <script src="{% static 'script.js' %}"></script>
 </body>
 </html>

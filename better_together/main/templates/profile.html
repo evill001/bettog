@@ -6,6 +6,149 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Личный кабинет - Better Together</title>
     <link rel="stylesheet" href="{% static 'styles.css' %}">
+    <style>
+        .profile-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        .profile-info {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            width: 50%;
+            max-width: 400px;
+        }
+
+        .profile-info p {
+            font-size: 16px;
+            margin: 10px 0;
+        }
+
+        .image-container {
+            position: relative;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .image-container img {
+            display: block;
+            width: 150px;
+            transition: opacity 0.3s;
+        }
+
+        .image-container .after-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 0;
+        }
+
+        .image-container:hover .before-image {
+            opacity: 0;
+        }
+
+        .image-container:hover .after-image {
+            opacity: 1;
+        }
+
+        .image-caption {
+            font-size: 12px;
+            color: #555;
+            margin-top: 5px;
+        }
+
+        .upload-form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+        }
+
+        .upload-form input[type="file"] {
+            display: none; /* Скрываем стандартный инпут */
+        }
+
+        .upload-label {
+            display: inline-block;
+            background-color: #17a2b8;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s ease;
+            width: 90%;
+            text-align: center;
+        }
+
+        .upload-label:hover {
+            background-color: #138496;
+        }
+
+        .upload-btn {
+            background-color: #28a745;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s ease;
+            width: 60%;
+            border: none;
+        }
+
+        .upload-btn:hover {
+            background-color: #218838;
+        }
+
+        .actions-cell {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px; /* Отступ между кнопками */
+        }
+
+        .actions-cell form {
+            width: 60%;
+        }
+
+        .actions-cell button {
+            width: 100%;
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s ease;
+        }
+
+        .actions-cell button:hover {
+            opacity: 0.8;
+        }
+
+        /* Цвета кнопок */
+        .update-btn {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .delete-btn {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .upload-btn {
+            background-color: #28a745;
+            color: white;
+        }
+
+    </style>
 </head>
 <body>
     <header>
@@ -19,14 +162,16 @@
                 <li><a href="{% url 'reports' %}">Созданные заявки</a></li>
                 <li><a href="{% url 'submit_request' %}">Подать заявку</a></li>
                 {% if user.is_authenticated %}
-                    <form action="{% url 'logout' %}" method="post" style="display: inline;">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-danger">Выйти</button>
-                    </form>
-                    <a href="{% url 'profile' %}">Личный кабинет</a>
+                    <li>
+                        <form action="{% url 'logout' %}" method="post">
+                            {% csrf_token %}
+                            <button type="submit" class="logout-btn">Выйти</button>
+                        </form>
+                    </li>
+                    <li><a href="{% url 'profile' %}">Личный кабинет</a></li>
                 {% else %}
-                    <a href="{% url 'login' %}">Вход</a>
-                    <a href="{% url 'register' %}">Регистрация</a>
+                    <li><a href="{% url 'login' %}">Вход</a></li>
+                    <li><a href="{% url 'register' %}">Регистрация</a></li>
                 {% endif %}
             </ul>
         </nav>
@@ -37,14 +182,14 @@
             <h2>Личный кабинет</h2>
             <div class="profile-info">
                 <p><strong>Логин:</strong> {{ user.username }}</p>
-                <p><strong>ФИО:</strong> {{ user.get_full_name }}</p>
+                <p><strong>ФИО:</strong> {{ user.full_name }}</p>
                 <p><strong>Email:</strong> {{ user.email }}</p>
                 <form action="{% url 'logout' %}" method="post">
                     {% csrf_token %}
                     <button type="submit" class="logout-button">Выход</button>
                 </form>
             </div>
-        </section>
+        </section>        
         
         <section class="requests-container">
             <h3>Созданные заявки</h3>
@@ -54,9 +199,10 @@
                         <tr>
                             <th>Временная метка</th>
                             <th>Название</th>
-                            <th>Категория заявки</th>
+                            <th>Категория</th>
                             <th>Фотография</th>
                             <th>Статус</th>
+                            {% if user.is_staff %} <th>Действия</th> {% endif %}
                         </tr>
                     </thead>
                     <tbody>
@@ -65,24 +211,43 @@
                             <td>{{ request.created_at|date:"d.m.Y H:i" }}</td>
                             <td>{{ request.title }}</td>
                             <td>{{ request.category }}</td>
-                            <td>{{ request.status }}</td>
                             <td>
-                                {% if request.image %}
-                                    <img src="{{ request.image.url }}" alt="Фото" width="100">
+                                {% if request.photo_before %}
+                                    <div class="image-container">
+                                        <img src="{{ request.photo_before.url }}" alt="Фото до" class="before-image">
+                                        {% if request.photo_after %}
+                                            <img src="{{ request.photo_after.url }}" alt="Фото после" class="after-image">
+                                            <div class="image-caption">До</div>
+                                        {% else %}
+                                            <div class="image-caption">Фото после отсутствует</div>
+                                        {% endif %}
+                                    </div>
                                 {% else %}
                                     Нет фото
                                 {% endif %}
                             </td>
-                            {% if user.is_staff %}  <!-- Админ видит кнопки управления -->
-                            <td>
+                            <td>{{ request.status }}</td>
+                            {% if user.is_staff %}
+                            <td class="actions-cell">
                                 <form action="{% url 'update_request_status' request.id %}" method="post">
                                     {% csrf_token %}
-                                    <button type="submit">Изменить статус</button>
+                                    <button type="submit" class="update-btn">Изменить статус</button>
                                 </form>
+                            
                                 <form action="{% url 'delete_request' request.id %}" method="post" onsubmit="return confirm('Вы уверены?');">
                                     {% csrf_token %}
                                     <button type="submit" class="delete-btn">Удалить</button>
                                 </form>
+                            
+                                {% if not request.photo_after %}
+                                <form action="{% url 'upload_after_photo' request.id %}" method="post" enctype="multipart/form-data" class="upload-form">
+                                    {% csrf_token %}
+                                    <label for="file-upload-{{ request.id }}" class="upload-label">Выберите файл</label>
+                                    <input type="file" name="photo_after" id="file-upload-{{ request.id }}" accept="image/*" required>
+                                    <button type="submit" class="upload-btn">Загрузить "После"</button>
+                                </form>
+                                
+                                {% endif %}
                             </td>
                             {% endif %}
                         </tr>
@@ -102,5 +267,6 @@
     <footer>
         <p>Политика конфиденциальности</p>
     </footer>
+    <script src="{% static 'script.js' %}"></script>
 </body>
 </html>

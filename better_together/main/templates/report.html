@@ -26,14 +26,16 @@
                 <li><a href="{% url 'reports' %}">Созданные заявки</a></li>
                 <li><a href="{% url 'submit_request' %}">Подать заявку</a></li>
                 {% if user.is_authenticated %}
-                    <form action="{% url 'logout' %}" method="post" style="display: inline;">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-danger">Выйти</button>
-                    </form>
-                    <a href="{% url 'profile' %}">Личный кабинет</a>
+                    <li>
+                        <form action="{% url 'logout' %}" method="post">
+                            {% csrf_token %}
+                            <button type="submit" class="logout-btn">Выйти</button>
+                        </form>
+                    </li>
+                    <li><a href="{% url 'profile' %}">Личный кабинет</a></li>
                 {% else %}
-                    <a href="{% url 'login' %}">Вход</a>
-                    <a href="{% url 'register' %}">Регистрация</a>
+                    <li><a href="{% url 'login' %}">Вход</a></li>
+                    <li><a href="{% url 'register' %}">Регистрация</a></li>
                 {% endif %}
             </ul>
         </nav>
@@ -58,6 +60,7 @@
     <footer>
         <p>Политика конфиденциальности</p>
     </footer>
+    <script src="{% static 'script.js' %}"></script>
     <script>
         document.addEventListener("DOMContentLoaded", () => {
         const burger = document.querySelector(".burger-menu");

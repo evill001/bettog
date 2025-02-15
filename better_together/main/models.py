@@ -20,27 +20,42 @@ class Request(models.Model):
         ('Общая', 'Общая'),
     ]
 
+    STATUS_CHOICES = [
+        ('Ожидание', 'Ожидание'),
+        ('Решено', 'Решено'),
+    ]
+
     title = models.CharField(max_length=200, verbose_name="Название")
     description = models.TextField(verbose_name="Описание")
-    category = models.CharField(  # Исправил опечатку "ategory" -> "category"
+    category = models.CharField(
         max_length=50,
         choices=CATEGORY_CHOICES,
         verbose_name="Категория",
         default="Техническая"
     )
-    image = models.ImageField(upload_to='requests/', blank=True, null=True, verbose_name="Фотография")
+    photo_before = models.ImageField(upload_to='requests/before/', blank=True, null=True, verbose_name="Фото до")
+    photo_after = models.ImageField(upload_to='requests/after/', blank=True, null=True, verbose_name="Фото после")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
-    status = models.CharField(max_length=20, choices=[('Ожидание', 'Ожидание'), ('Решено', 'Решено')], default='Ожидание', verbose_name="Статус")
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Ожидание', verbose_name="Статус")
 
     def __str__(self):
         return self.title
 
+
 class Report(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)  # Заменил `User` на `settings.AUTH_USER_MODEL`
-    title = models.CharField(max_length=255)
-    description = models.TextField()
-    file = models.FileField(upload_to="reports/", blank=True, null=True)
-    created_at = models.DateTimeField(auto_now_add=True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)  # Автор заявки
+    title = models.CharField(max_length=255, verbose_name="Название")
+    description = models.TextField(verbose_name="Описание")
+    file = models.FileField(upload_to="reports/", blank=True, null=True, verbose_name="Файл")
+    image_before = models.ImageField(upload_to="reports/before/", blank=True, null=True, verbose_name="Фото до")
+    image_after = models.ImageField(upload_to="reports/after/", blank=True, null=True, verbose_name="Фото после (заполняет админ)")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
+    
+    STATUS_CHOICES = [
+        ("pending", "В ожидании"),
+        ("resolved", "Решено"),
+    ]
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="pending", verbose_name="Статус")
 
     def __str__(self):
         return self.title

@@ -16,4 +16,5 @@ urlpatterns = [
     path("request/new/", create_request, name="submit_request"),
     path("request/<int:request_id>/delete/", delete_request, name="delete_request"),
     path("request/<int:request_id>/update_status/", update_request_status, name="update_request_status"),
+    path('upload_after_photo/<int:request_id>/', views.upload_after_photo, name='upload_after_photo')
 ]

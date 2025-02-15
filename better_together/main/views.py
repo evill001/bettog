@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login
-from .forms import RegistrationForm, ReportForm
+from .forms import RegistrationForm
 from .models import Report, Request, CustomUser
 from .forms import RequestForm  # Добавляем форму заявок
 
@@ -43,15 +43,11 @@ def register(request):
 @login_required
 def submit_request(request):
     if request.method == "POST":
-        print(f"request.user: {request.user}")  
-        print(f"request.user.is_authenticated: {request.user.is_authenticated}")  
-        print(f"request.user.id: {request.user.id}")  
-
         form = RequestForm(request.POST, request.FILES)
         if form.is_valid():
             new_request = form.save(commit=False)
             new_request.user = request.user  
-            print(f"new_request.user перед сохранением: {new_request.user}")  
+            new_request.photo_before = form.cleaned_data.get("photo_before")  # Фотография падает в "до"
             new_request.save()
             return redirect("reports")
     else:
@@ -133,3 +129,12 @@ def update_request_status(request, request_id):
         messages.error(request, "У вас нет прав на изменение статуса.")
 
     return redirect("profile")
+
+@login_required
+def upload_after_photo(request, request_id):
+    if request.method == "POST" and request.user.is_staff:
+        request_obj = get_object_or_404(Request, id=request_id)
+        if 'photo_after' in request.FILES:
+            request_obj.photo_after = request.FILES['photo_after']
+            request_obj.save()
+    return redirect('profile')

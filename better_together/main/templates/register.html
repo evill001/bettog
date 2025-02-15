@@ -7,65 +7,151 @@
     <title>Регистрация - Better Together</title>
     <link rel="stylesheet" href="{% static 'styles.css' %}">
     <style>
-        main {
-            padding: 20px;
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
             display: flex;
             justify-content: center;
-        }       
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+        }
+
+        .register-container {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 450px;
+            text-align: center;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            text-align: left;
+        }
+
+        label {
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        input, button {
+            padding: 10px;
+            margin-top: 5px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            width: 100%;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .cancel-btn {
+            background: none;
+            color: #555;
+            text-decoration: none;
+            margin-top: 10px;
+            display: inline-block;
+            transition: 0.3s;
+        }
+
+        .cancel-btn:hover {
+            color: #000;
+        }
+
+        /* Ошибки (выравниваем влево) */
+        .errorlist {
+            color: red;
+            font-size: 14px;
+            text-align: left;
+            margin: 5px 0;
+            padding-left: 10px;
+        }
+
+        /* Чекбокс */
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .checkbox-container input {
+            width: 18px;
+            height: 18px;
+        }
     </style>
 </head>
 <body>
-    <header>
-        <div class="logo">
-            <img src="{% static 'logo.png' %}" alt="Logo">
-            <span>Better together</span>
-        </div>
-        <nav>
-            <ul class="nav-links">
-                <li><a href="{% url 'index' %}">Главная</a></li>
-                <li><a href="{% url 'reports' %}">Созданные заявки</a></li>
-                <li><a href="{% url 'submit_request' %}">Подать заявку</a></li>
-                {% if user.is_authenticated %}
-                    <form action="{% url 'logout' %}" method="post" style="display: inline;">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-danger">Выйти</button>
-                    </form>
-                    <a href="{% url 'profile' %}">Личный кабинет</a>
-                {% else %}
-                    <a href="{% url 'login' %}">Вход</a>
-                    <a href="{% url 'register' %}">Регистрация</a>
-                {% endif %}
-            </ul>
-        </nav>
-        <div class="burger-menu">
-            <span></span>
-            <span></span>
-            <span></span>
-        </div>
-    </header>
-    
-    {% block content %}
+
+    <div class="register-container">
         <h2>Регистрация</h2>
         <form method="post">
             {% csrf_token %}
-            {{ form.as_p }}
+
+            <!-- Поле ФИО -->
+            <label for="{{ form.full_name.id_for_label }}">ФИО:</label>
+            {{ form.full_name }}
+            {{ form.full_name.errors }}
+
+            <!-- Поле username -->
+            <label for="{{ form.username.id_for_label }}">Имя пользователя:</label>
+            {{ form.username }}
+            <small class="helptext">{{ form.username.help_text }}</small>
+            {{ form.username.errors }}
+
+            <!-- Поле Email -->
+            <label for="{{ form.email.id_for_label }}">Email:</label>
+            {{ form.email }}
+            {{ form.email.errors }}
+
+            <!-- Поле Пароль -->
+            <label for="{{ form.password1.id_for_label }}">Пароль:</label>
+            {{ form.password1 }}
+            <ul class="helptext">
+                <li>Пароль не должен быть слишком похож на другие ваши данные</li>
+                <li>Должен содержать минимум 8 символов</li>
+                <li>Не должен быть слишком простым</li>
+                <li>Не может состоять только из цифр</li>
+            </ul>
+            {{ form.password1.errors }}
+
+            <!-- Подтверждение пароля -->
+            <label for="{{ form.password2.id_for_label }}">Подтверждение пароля:</label>
+            {{ form.password2 }}
+            {{ form.password2.errors }}
+
+            <!-- Чекбокс согласия -->
+            <div class="checkbox-container">
+                {{ form.agree }}
+                <label for="{{ form.agree.id_for_label }}">Согласие на обработку данных</label>
+            </div>
+            {{ form.agree.errors }}
+
             <button type="submit">Зарегистрироваться</button>
         </form>
-    {% endblock %}
-    
-    <footer>
-        <p>Политика конфиденциальности</p>
-    </footer>
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-        const burger = document.querySelector(".burger-menu");
-        const nav = document.querySelector(".nav-links");
-
-        burger.addEventListener("click", () => {
-            nav.classList.toggle("active");
-            burger.classList.toggle("active");
-        });
-    });
-    </script>
+        <a href="{% url 'index' %}" class="cancel-btn">Отмена</a>
+    </div>
+    <script src="{% static 'script.js' %}"></script>
 </body>
 </html>
