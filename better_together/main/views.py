@@ -121,14 +121,22 @@ def delete_request(request, request_id):
 def update_request_status(request, request_id):
     request_obj = get_object_or_404(Request, id=request_id)
 
-    if request.user.is_staff:  # Только админ может менять статус
-        request_obj.status = "Решено" if request_obj.status == "Ожидание" else "Ожидание"
-        request_obj.save()
-        messages.success(request, "Статус заявки обновлён!")
+    if request.user.is_staff:  # Проверяем, что это админ
+        new_status = request.POST.get("status")
+
+        if new_status == "Решена" and not request_obj.photo_after:
+            messages.error(request, "Нельзя установить статус 'Решена' без фото 'После'.")
+        elif request_obj.status not in ["Решена", "Отклонена"]:  # Только если заявка не закрыта
+            request_obj.status = new_status
+            request_obj.save()
+            messages.success(request, "Статус заявки обновлён!")
+        else:
+            messages.error(request, "Нельзя изменить статус завершённой заявки.")
     else:
         messages.error(request, "У вас нет прав на изменение статуса.")
 
     return redirect("profile")
+
 
 @login_required
 def upload_after_photo(request, request_id):

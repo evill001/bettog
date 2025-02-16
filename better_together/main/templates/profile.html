@@ -148,6 +148,38 @@
             color: white;
         }
 
+        .status-form {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-form select {
+            padding: 6px 10px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            background-color: white;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .status-form button {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s ease;
+            background-color: #007bff;
+            color: white;
+        }
+
+        .status-form button:hover {
+            background-color: #0056b3;
+        }
+        .status-form select option:disabled {
+            color: #ccc;
+        }
     </style>
 </head>
 <body>
@@ -175,6 +207,11 @@
                 {% endif %}
             </ul>
         </nav>
+        <div class="burger-menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
     </header>
     
     <main>
@@ -229,9 +266,14 @@
                             <td>{{ request.status }}</td>
                             {% if user.is_staff %}
                             <td class="actions-cell">
-                                <form action="{% url 'update_request_status' request.id %}" method="post">
+                                <form action="{% url 'update_request_status' request.id %}" method="post" class="status-form">
                                     {% csrf_token %}
-                                    <button type="submit" class="update-btn">Изменить статус</button>
+                                    <select name="status" required>
+                                        <option value="" disabled selected>Выберите статус</option>
+                                        <option value="Отклонена">Отклонена</option>
+                                        <option value="Решена" {% if not request.photo_after %}disabled{% endif %}>Решена</option>
+                                    </select>
+                                    <button type="submit">Обновить</button>
                                 </form>
                             
                                 <form action="{% url 'delete_request' request.id %}" method="post" onsubmit="return confirm('Вы уверены?');">

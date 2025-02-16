@@ -8,6 +8,15 @@ class RequestAdmin(admin.ModelAdmin):
     search_fields = ("title", "description")  
     readonly_fields = ("created_at",)  
 
+    def save_model(self, request, obj, form, change):
+        # Блокируем изменение статуса, если он уже "Решена" или "Отклонена"
+        if obj.pk:  # Если объект уже существует
+            original = Request.objects.get(pk=obj.pk)
+            if original.status in ["Решена", "Отклонена"]:
+                return  # Не даём сохранить изменения
+                
+        super().save_model(request, obj, form, change) 
+
 @admin.register(Report)
 class ReportAdmin(admin.ModelAdmin):
     list_display = ("title", "user", "created_at")  

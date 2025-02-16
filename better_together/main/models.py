@@ -21,8 +21,9 @@ class Request(models.Model):
     ]
 
     STATUS_CHOICES = [
-        ('Ожидание', 'Ожидание'),
-        ('Решено', 'Решено'),
+    ('Новая', 'Новая'),
+    ('Решена', 'Решена'),
+    ('Отклонена', 'Отклонена'),
     ]
 
     title = models.CharField(max_length=200, verbose_name="Название")
@@ -36,7 +37,7 @@ class Request(models.Model):
     photo_before = models.ImageField(upload_to='requests/before/', blank=True, null=True, verbose_name="Фото до")
     photo_after = models.ImageField(upload_to='requests/after/', blank=True, null=True, verbose_name="Фото после")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Ожидание', verbose_name="Статус")
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Новая', verbose_name="Статус")
 
     def __str__(self):
         return self.title
