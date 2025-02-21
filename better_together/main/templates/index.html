@@ -12,23 +12,29 @@
             display: inline-block;
             text-align: center;
         }
+
         .image-container img {
             display: block;
-            width: 150px;
+            width: 150px; /* Размер можно изменить позже */
+            height: auto;
             transition: opacity 0.3s;
         }
-        .image-container .after-image {
+
+        .image-container .before-image {
             position: absolute;
             top: 0;
             left: 0;
             opacity: 0;
         }
+
         .image-container:hover .before-image {
-            opacity: 0;
-        }
-        .image-container:hover .after-image {
             opacity: 1;
         }
+
+        .image-container:hover .after-image {
+            opacity: 0;
+        }
+
         .image-caption {
             font-size: 12px;
             color: #555;
@@ -90,20 +96,25 @@
                         <td>{{ request.title }}</td>
                         <td>{{ request.category }}</td>
                         <td>
-                            {% if request.photo_before %}
-                                <div class="image-container">
-                                    <img src="{{ request.photo_before.url }}" alt="Фото до" class="before-image">
-                                    {% if request.photo_after %}
-                                        <img src="{{ request.photo_after.url }}" alt="Фото после" class="after-image">
-                                        <div class="image-caption">До</div>
+                            <div class="image-container">
+                                {% if request.photo_after %}
+                                    <img src="{{ request.photo_after.url }}" alt="Фото после" class="after-image">
+                                    {% if request.photo_before %}
+                                        <img src="{{ request.photo_before.url }}" alt="Фото до" class="before-image">
+                                        <div class="image-caption">После</div>
                                     {% else %}
-                                        <div class="image-caption">Фото после отсутствует</div>
+                                        <div class="image-caption">Фото до отсутствует</div>
                                     {% endif %}
-                                </div>
-                            {% else %}
-                                Нет фото
-                            {% endif %}
-                        </td>                        
+                                {% else %}
+                                    {% if request.photo_before %}
+                                        <img src="{{ request.photo_before.url }}" alt="Фото до">
+                                        <div class="image-caption">Фото до</div>
+                                    {% else %}
+                                        Нет фото
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                        </td>                                                                        
                     </tr>
                     {% empty %}
                     <tr>
@@ -125,16 +136,16 @@
                 const beforeImage = container.querySelector(".before-image");
                 const afterImage = container.querySelector(".after-image");
                 const caption = container.querySelector(".image-caption");
-                
+
                 container.addEventListener("mouseenter", () => {
-                    if (afterImage) {
-                        caption.textContent = "После";
+                    if (beforeImage) {
+                        caption.textContent = "До";
                     }
                 });
-                
+
                 container.addEventListener("mouseleave", () => {
                     if (afterImage) {
-                        caption.textContent = "До";
+                        caption.textContent = "После";
                     }
                 });
             });

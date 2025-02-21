@@ -41,19 +41,23 @@
             transition: opacity 0.3s;
         }
 
-        .image-container .after-image {
+        .image-container .before-image {
             position: absolute;
             top: 0;
             left: 0;
-            opacity: 0;
+            opacity: 0; /* Скрываем "до" по умолчанию */
+        }
+
+        .image-container .after-image {
+            opacity: 1; /* Показываем "после" сразу */
         }
 
         .image-container:hover .before-image {
-            opacity: 0;
+            opacity: 1; /* При наведении показываем "до" */
         }
 
         .image-container:hover .after-image {
-            opacity: 1;
+            opacity: 0; /* Скрываем "после" */
         }
 
         .image-caption {
@@ -180,6 +184,12 @@
         .status-form select option:disabled {
             color: #ccc;
         }
+        .rejection-reason {
+            color: red;
+            font-size: 14px;
+            margin-top: 5px;
+            white-space: pre-wrap;
+        }
     </style>
 </head>
 <body>
@@ -249,38 +259,52 @@
                             <td>{{ request.title }}</td>
                             <td>{{ request.category }}</td>
                             <td>
-                                {% if request.photo_before %}
-                                    <div class="image-container">
-                                        <img src="{{ request.photo_before.url }}" alt="Фото до" class="before-image">
-                                        {% if request.photo_after %}
-                                            <img src="{{ request.photo_after.url }}" alt="Фото после" class="after-image">
-                                            <div class="image-caption">До</div>
+                                <div class="image-container">
+                                    {% if request.photo_after %}
+                                        <img src="{{ request.photo_after.url }}" alt="Фото после" class="after-image">
+                                        {% if request.photo_before %}
+                                            <img src="{{ request.photo_before.url }}" alt="Фото до" class="before-image">
                                         {% else %}
-                                            <div class="image-caption">Фото после отсутствует</div>
+                                            <div class="image-caption">Фото до отсутствует</div>
                                         {% endif %}
-                                    </div>
-                                {% else %}
-                                    Нет фото
+                                    {% else %}
+                                        {% if request.photo_before %}
+                                            <img src="{{ request.photo_before.url }}" alt="Фото до">
+                                        {% else %}
+                                            <div class="image-caption">Нет фото</div>
+                                        {% endif %}
+                                    {% endif %}
+                                </div>
+                            </td>
+                            <td>
+                                <strong>{{ request.status }}</strong>
+                                {% if request.status == "Отклонена" %}
+                                    <div class="rejection-reason">Причина: {{ request.rejection_reason }}</div>
                                 {% endif %}
                             </td>
-                            <td>{{ request.status }}</td>
+                            <td class="actions-cell">
+                                {% if request.user == request.user or user.is_staff %}
+                                    <form action="{% url 'delete_request' request.id %}" method="post">
+                                        {% csrf_token %}
+                                        <button type="submit">Удалить</button>
+                                    </form>
+                                {% endif %}
+                            </td>  
                             {% if user.is_staff %}
                             <td class="actions-cell">
                                 <form action="{% url 'update_request_status' request.id %}" method="post" class="status-form">
                                     {% csrf_token %}
-                                    <select name="status" required>
+                                    <select name="status" class="status-select" required>
                                         <option value="" disabled selected>Выберите статус</option>
                                         <option value="Отклонена">Отклонена</option>
                                         <option value="Решена" {% if not request.photo_after %}disabled{% endif %}>Решена</option>
                                     </select>
+                    
+                                    <textarea name="rejection_reason" class="rejection-reason" placeholder="Укажите причину отклонения..." style="display: none;"></textarea>
+                    
                                     <button type="submit">Обновить</button>
                                 </form>
-                            
-                                <form action="{% url 'delete_request' request.id %}" method="post" onsubmit="return confirm('Вы уверены?');">
-                                    {% csrf_token %}
-                                    <button type="submit" class="delete-btn">Удалить</button>
-                                </form>
-                            
+                    
                                 {% if not request.photo_after %}
                                 <form action="{% url 'upload_after_photo' request.id %}" method="post" enctype="multipart/form-data" class="upload-form">
                                     {% csrf_token %}
@@ -288,7 +312,6 @@
                                     <input type="file" name="photo_after" id="file-upload-{{ request.id }}" accept="image/*" required>
                                     <button type="submit" class="upload-btn">Загрузить "После"</button>
                                 </form>
-                                
                                 {% endif %}
                             </td>
                             {% endif %}
@@ -298,7 +321,7 @@
                             <td colspan="6">Заявок пока нет.</td>
                         </tr>
                         {% endfor %}
-                    </tbody>
+                    </tbody>                    
                 </table>
             {% else %}
                 <p>У вас пока нет заявок.</p>
@@ -310,5 +333,44 @@
         <p>Политика конфиденциальности</p>
     </footer>
     <script src="{% static 'script.js' %}"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            document.querySelectorAll(".image-container").forEach(container => {
+                const beforeImage = container.querySelector(".before-image");
+                const afterImage = container.querySelector(".after-image");
+                const caption = container.querySelector(".image-caption");
+
+                container.addEventListener("mouseenter", () => {
+                    if (beforeImage) {
+                        caption.textContent = "До";
+                    }
+                });
+
+                container.addEventListener("mouseleave", () => {
+                    if (afterImage) {
+                        caption.textContent = "После";
+                    }
+                });
+            });
+        });
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            document.querySelectorAll(".status-form").forEach(form => {
+                const select = form.querySelector(".status-select");
+                const reasonField = form.querySelector(".rejection-reason");
+        
+                select.addEventListener("change", function () {
+                    if (select.value === "Отклонена") {
+                        reasonField.style.display = "block";
+                        reasonField.required = true;
+                    } else {
+                        reasonField.style.display = "none";
+                        reasonField.required = false;
+                    }
+                });
+            });
+        });
+    </script>        
 </body>
 </html>

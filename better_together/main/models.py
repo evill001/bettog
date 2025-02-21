@@ -38,6 +38,7 @@ class Request(models.Model):
     photo_after = models.ImageField(upload_to='requests/after/', blank=True, null=True, verbose_name="Фото после")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Новая', verbose_name="Статус")
+    rejection_reason = models.TextField(blank=True, null=True)
 
     def __str__(self):
         return self.title

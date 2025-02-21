@@ -109,32 +109,36 @@ def reports(request):
 def delete_request(request, request_id):
     request_obj = get_object_or_404(Request, id=request_id)
 
-    if request.user.is_staff:  # Только админ может удалять заявки
+    if request.user == request_obj.user or request.user.is_staff:  # Только автор заявки или админ
         request_obj.delete()
         messages.success(request, "Заявка успешно удалена!")
     else:
         messages.error(request, "У вас нет прав на удаление этой заявки.")
 
-    return redirect("profile")  # Перенаправляем обратно в личный кабинет
+    return redirect("profile")
+
 
 @login_required
 def update_request_status(request, request_id):
-    request_obj = get_object_or_404(Request, id=request_id)
+    if request.method == "POST":
+        req = get_object_or_404(Request, id=request_id)
 
-    if request.user.is_staff:  # Проверяем, что это админ
         new_status = request.POST.get("status")
+        rejection_reason = request.POST.get("rejection_reason", "").strip()
 
-        if new_status == "Решена" and not request_obj.photo_after:
-            messages.error(request, "Нельзя установить статус 'Решена' без фото 'После'.")
-        elif request_obj.status not in ["Решена", "Отклонена"]:  # Только если заявка не закрыта
-            request_obj.status = new_status
-            request_obj.save()
-            messages.success(request, "Статус заявки обновлён!")
+        if new_status == "Отклонена" and not rejection_reason:
+            messages.error(request, "Укажите причину отклонения!")
+            return redirect("profile")
+
+        req.status = new_status
+        if new_status == "Отклонена":
+            req.rejection_reason = rejection_reason  # Сохраняем причину
         else:
-            messages.error(request, "Нельзя изменить статус завершённой заявки.")
-    else:
-        messages.error(request, "У вас нет прав на изменение статуса.")
-
+            req.rejection_reason = ""  # Очищаем причину, если статус не "Отклонена"
+        
+        req.save()
+        messages.success(request, "Статус успешно обновлен!")
+        
     return redirect("profile")
 
 
